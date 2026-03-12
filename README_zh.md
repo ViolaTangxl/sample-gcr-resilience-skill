@@ -1,8 +1,8 @@
 中文 | [**English**](README.md)
 
-# AWS 韧性评估技能集 (Claude Code)
+# AWS 韧性评估技能集
 
-一组 [Claude Code](https://docs.anthropic.com/en/docs/claude-code) 自定义技能，用于全面的 AWS 系统韧性分析与风险评估，基于 2025 年最新业界最佳实践构建。
+一组 AI 驱动的自定义技能，用于全面的 AWS 系统韧性分析与风险评估，基于 2025 年最新业界最佳实践构建。兼容任何支持 skill/prompt 框架的 AI 编程助手。
 
 ## 技能列表
 
@@ -75,19 +75,19 @@
 
 ## 前提条件
 
-### 1. Claude Code
+### 1. AI 编程助手
 
-安装 [Claude Code](https://docs.anthropic.com/en/docs/claude-code) CLI。
+任何支持自定义技能的 AI 编程助手（即支持 skill/prompt 框架的 AI 工具）。
 
 ### 2. 安装
 
-克隆本仓库并将技能添加到你的 Claude Code 项目中：
+克隆本仓库并将技能添加到你的项目中：
 
 ```bash
 git clone https://github.com/aws-samples/sample-gcr-resilience-skill.git
 ```
 
-将技能目录复制到项目的 `.claude/skills/` 文件夹中，或直接引用。
+将技能目录复制到项目的技能文件夹中，或直接引用。
 
 ### 3. AWS 访问权限（推荐）
 

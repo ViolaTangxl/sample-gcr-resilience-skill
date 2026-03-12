@@ -1,8 +1,8 @@
 [**中文**](README_zh.md) | English
 
-# AWS Resilience Assessment Skills for Claude Code
+# AWS Resilience Assessment Skills
 
-A collection of [Claude Code](https://docs.anthropic.com/en/docs/claude-code) custom skills for comprehensive AWS system resilience analysis and risk assessment, built on 2025 industry best practices.
+A collection of AI-powered custom skills for comprehensive AWS system resilience analysis and risk assessment, built on 2025 industry best practices. Compatible with any AI coding assistant that supports the skill/prompt framework.
 
 ## Skills
 
@@ -75,19 +75,19 @@ Each assessment generates:
 
 ## Prerequisites
 
-### 1. Claude Code
+### 1. AI Coding Assistant
 
-Install [Claude Code](https://docs.anthropic.com/en/docs/claude-code) CLI.
+Any AI coding assistant that supports custom skills (e.g., skill/prompt-based AI tools).
 
 ### 2. Setup
 
-Clone this repository and add the skills to your Claude Code project:
+Clone this repository and add the skills to your project:
 
 ```bash
 git clone https://github.com/aws-samples/sample-gcr-resilience-skill.git
 ```
 
-Copy the skill directories into your project's `.claude/skills/` folder, or reference them directly.
+Copy the skill directories into your project's skills folder, or reference them directly.
 
 ### 3. AWS Access (Recommended)
 
