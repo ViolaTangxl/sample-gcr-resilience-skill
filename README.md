@@ -12,13 +12,13 @@ This project includes two complementary skills:
 
 A full-scope AWS infrastructure resilience analysis skill. It maps system components, identifies failure modes, performs risk-prioritized assessments, and generates detailed reports with actionable mitigation strategies.
 
-**Invoke:** `/aws-resilience-assessment` or mention keywords like "AWS resilience assessment" in conversation.
+**Invoke:** mention keywords like "AWS resilience assessment" in conversation.
 
 ### 2. RMA Assessment Assistant (`aws-rma-assessment`)
 
 An interactive Reliability, Maintainability, and Availability (RMA) assessment skill. It evaluates application resilience maturity through guided Q&A based on the AWS Well-Architected Framework, and generates assessment reports with improvement roadmaps.
 
-**Invoke:** `/rma-assessment-assistant` or mention keywords like "RMA assessment" in conversation.
+**Invoke:** mention keywords like "RMA assessment" in conversation.
 
 ## Features
 

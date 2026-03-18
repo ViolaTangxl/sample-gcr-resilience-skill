@@ -9,6 +9,7 @@
 - ✅ 包含 **混沌工程** 方法论（AWS FIS）
 - ✅ 采用 **AWS 可观测性最佳实践**（CloudWatch、X-Ray、分布式追踪）
 - ✅ 应用 **云设计模式**（Circuit Breaker、Bulkhead、Retry）
+- ✅ 内置 **AWS 常见服务风险参考库**（50+ 个风险点，覆盖存储/数据库/EKS/EC2/网络）
 
 ## 使用方式
 
@@ -101,6 +102,11 @@ Claude: [自动加载 aws-resilience-assessment skill]
    - 混沌工程计划
 
 ### 附加文件
+
+**common-risks-reference.md** - AWS 常见服务风险参考手册
+- 覆盖存储（EBS/S3/EFS/FSx）、数据库、容器（EKS）、计算（EC2）、网络五大类
+- 50+ 个常见风险点，每个包含风险原因和改进建议
+- 评估检查清单，按服务类型逐项确认
 
 **resilience-testing.md** - 故障注入测试计划
 - 针对 Top 10 风险的混沌实验
@@ -265,6 +271,13 @@ A: 分析报告包含：
 A: 当前专注于 AWS 环境，提供基于 AWS Well-Architected Framework 的专业韧性评估。
 
 ## 更新日志
+
+### v1.1.0 (2026-03-14)
+- ✅ 新增 `common-risks-reference.md` — AWS 常见服务风险参考手册
+- ✅ 整合 50+ 个常见风险点（存储/数据库/EKS/EC2/网络）
+- ✅ 新增按服务类型的评估检查清单
+- ✅ SKILL.md 故障模式识别任务引用风险参考
+- ✅ 风险分类细化对齐实际 AWS 服务
 
 ### v1.0.0 (2025-02-17)
 - ✅ 初始版本
