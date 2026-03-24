@@ -44,65 +44,72 @@ model: sonnet
 
 ## ⚙️ MCP 服务器要求（推荐配置）
 
-为了实现自动化 AWS 资源扫描和分析，本 Skill 推荐使用以下 MCP 服务器：
+为了实现自动化 AWS 资源扫描和分析，本 Skill 推荐使用 AWS 官方 [awslabs.core-mcp-server](https://github.com/awslabs/mcp/tree/main/src/core-mcp-server)。
 
-### 核心 MCP 服务器（已配置）
+### 推荐 MCP 配置（awslabs.core-mcp-server）
 
-✅ **aws-manager** (mcp-aws-manager)
-- EC2 实例管理和清单
-- Lambda 函数操作
-- SSM (Systems Manager) 操作
-- 适用于：计算资源的韧性分析
+通过基于角色的环境变量，一个配置即可覆盖韧性评估所需的全部能力：
 
-✅ **aws-core** (@imazhar101/mcp-aws-server)
-- DynamoDB 表操作
-- Lambda 函数管理
-- API Gateway 管理
-- 适用于：无服务器架构的韧性分析
+| 角色环境变量 | 说明 | 包含的子服务器 | 韧性评估用途 |
+|-------------|------|---------------|-------------|
+| `aws-foundation` | AWS 知识和 API | aws-knowledge-server, aws-api-server | 查询 AWS 文档和 API |
+| `monitoring-observability` | 监控与可观测性 | cloudwatch-server, cloudtrail-server | 分析告警、指标、日志 |
+| `solutions-architect` | 解决方案架构 | diagram-server, pricing-server, cost-explorer-server | 架构图、成本分析 |
+| `security-identity` | 安全与身份 | iam-server, well-architected-security-server | IAM 审计、Well-Architected 评估 |
 
-✅ **aws-sso** (@aashari/mcp-server-aws-sso)
-- AWS SSO 设备认证流程
-- 多账户/多角色管理
-- 安全执行 AWS CLI 命令
-- 适用于：多账户环境的韧性分析
+> **最小推荐组合**：`aws-foundation` + `monitoring-observability` + `solutions-architect`
 
-### 扩展服务支持
+#### 只读安全说明
 
-对于以下 AWS 服务，通过 `aws-sso` MCP 的 AWS CLI 命令支持：
+韧性评估只需要只读访问。上述角色中的子服务器（cloudwatch-server、cloudtrail-server、iam-server 等）默认均为只读操作（仅 Describe/Get/List），不会对 AWS 资源做任何变更。
 
-📊 **Amazon CloudWatch**
-```bash
-aws cloudwatch describe-alarms
-aws logs describe-log-groups
-aws cloudwatch get-metric-statistics
+#### Kiro 配置示例
+
+编辑 `.kiro/settings/mcp.json`：
+
+```json
+{
+  "mcpServers": {
+    "awslabs-core-mcp-server": {
+      "command": "uvx",
+      "args": ["awslabs.core-mcp-server@latest"],
+      "env": {
+        "FASTMCP_LOG_LEVEL": "ERROR",
+        "AWS_PROFILE": "default",
+        "AWS_REGION": "us-east-1",
+        "aws-foundation": "true",
+        "monitoring-observability": "true",
+        "solutions-architect": "true",
+        "security-identity": "true"
+      },
+      "disabled": false,
+      "autoApprove": []
+    }
+  }
+}
 ```
 
-🚢 **Amazon EKS**
-```bash
-aws eks list-clusters
-aws eks describe-cluster --name <cluster-name>
-aws eks list-nodegroups --cluster-name <cluster-name>
-```
+#### Claude Code 配置示例
 
-🗄️ **Amazon RDS**
 ```bash
-aws rds describe-db-instances
-aws rds describe-db-clusters
-```
-
-🌐 **Elastic Load Balancing**
-```bash
-aws elbv2 describe-load-balancers
-aws elbv2 describe-target-groups
+claude mcp add awslabs-core-mcp-server \
+  -e FASTMCP_LOG_LEVEL=ERROR \
+  -e AWS_PROFILE=default \
+  -e AWS_REGION=us-east-1 \
+  -e aws-foundation=true \
+  -e monitoring-observability=true \
+  -e solutions-architect=true \
+  -e security-identity=true \
+  -- uvx awslabs.core-mcp-server@latest
 ```
 
 ### 配置检查
 
 **在开始评估前，请确认：**
 
-1. ✅ Claude Desktop 配置文件存在：`~/.config/claude/claude_desktop_config.json`
+1. ✅ MCP 服务器已配置并运行（Kiro: 功能面板 → MCP Server 视图 / Claude Code: `/mcp`）
 2. ✅ AWS 凭证已配置：`~/.aws/credentials` 或环境变量
-3. ✅ Claude Desktop 已重启（配置生效）
+3. ✅ Python 3.12+ 和 [uv](https://github.com/astral-sh/uv) 已安装
 
 **如果 MCP 未配置**，Skill 将自动切换到以下备用方式：
 - 📄 分析 IaC 代码（Terraform/CloudFormation）
@@ -111,7 +118,7 @@ aws elbv2 describe-target-groups
 
 ### MCP 配置帮助
 
-如需配置 MCP 服务器，请参考：`~/.claude/skills/aws-resilience-assessment/MCP_SETUP_GUIDE.md`
+如需详细配置指南，请参考：[MCP_SETUP_GUIDE.md](MCP_SETUP_GUIDE.md)
 
 ---
 
