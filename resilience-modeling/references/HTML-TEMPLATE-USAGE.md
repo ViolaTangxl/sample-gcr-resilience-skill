@@ -37,18 +37,23 @@ AWS Resilience Assessment Skill现在支持生成**美观的交互式HTML报告*
 ### 核心文件
 
 ```
-aws-resilience-assessment/
-├── html-report-template.html      # HTML模板文件（新增）
-├── generate-html-report.py        # Python报告生成器（新增）
-├── SKILL.md                       # Skill配置（已更新）
-├── README.md                      # Skill说明文档
-├── resilience-framework.md        # 评估框架
-└── example-report-template.md     # Markdown报告示例
+resilience-modeling/
+├── SKILL.md                                    # Skill 主配置
+├── README.md                                   # Skill 说明文档
+├── references/
+│   ├── resilience-framework.md                 # 评估框架
+│   ├── report-generation.md                    # 报告生成流程
+│   └── ...                                     # 其他参考文件
+├── scripts/
+│   └── generate-html-report.py                 # Python 报告生成器
+└── assets/
+    ├── html-report-template.html               # HTML 交互式报告模板
+    └── example-report-template.md              # Markdown 报告示例
 ```
 
 ### 模板文件结构
 
-**html-report-template.html** 包含：
+**assets/html-report-template.html** 包含：
 
 ```html
 <!DOCTYPE html>
@@ -149,8 +154,9 @@ assessment_data = {
 
 ```bash
 # 方式A：使用Python模块
-cd ~/.claude/skills/aws-resilience-assessment
+cd ~/.claude/skills/resilience-modeling
 python3 -c "
+import sys; sys.path.insert(0, 'scripts')
 from generate_html_report import generate_html_report
 import json
 
@@ -163,7 +169,7 @@ print(f'✅ 报告已生成: {output}')
 "
 
 # 方式B：直接运行脚本（使用示例数据）
-./generate-html-report.py
+python3 scripts/generate-html-report.py
 ```
 
 **步骤3：查看报告**
@@ -185,7 +191,7 @@ firefox project-resilience-assessment-2026-03-03.html
 
 ```bash
 # 1. 复制模板
-cp html-report-template.html my-project-report.html
+cp assets/html-report-template.html my-project-report.html
 
 # 2. 使用sed替换占位符
 sed -i '' 's/{{PROJECT_NAME}}/我的项目/g' my-project-report.html
@@ -212,9 +218,9 @@ sed -i '' 's/{{RESILIENCE_DATA}}/[4, 3, 4, 3, 4, 5, 3, 4, 4]/g' my-project-repor
 from pathlib import Path
 import sys
 
-# 添加skill目录到Python路径
-skill_dir = Path.home() / '.claude' / 'skills' / 'aws-resilience-assessment'
-sys.path.insert(0, str(skill_dir))
+# 添加scripts目录到Python路径
+skill_dir = Path.home() / '.claude' / 'skills' / 'resilience-modeling'
+sys.path.insert(0, str(skill_dir / 'scripts'))
 
 from generate_html_report import generate_html_report
 
@@ -247,7 +253,7 @@ print(f"✅ 交互式HTML报告: {html_file}")
 
 ### 修改配色方案
 
-在`html-report-template.html`中修改CSS变量：
+在 `assets/html-report-template.html` 中修改CSS变量：
 
 ```css
 :root {
@@ -281,7 +287,7 @@ const costTrendChart = new Chart(ctx, {
 
 ### 添加自定义风险字段
 
-在`generate-html-report.py`中扩展风险数据结构：
+在 `scripts/generate-html-report.py` 中扩展风险数据结构：
 
 ```python
 risk_cards_html += f"""
@@ -467,7 +473,7 @@ diagram = re.sub(r'\s+', ' ', diagram).strip()
 1. 查看 `SKILL.md` 了解完整工作流程
 2. 查看 `README.md` 了解Skill基础信息
 3. 查看 `resilience-framework.md` 了解评估框架
-4. 运行 `./generate-html-report.py` 查看示例报告
+4. 运行 `python3 scripts/generate-html-report.py` 查看示例报告
 
 ---
 
