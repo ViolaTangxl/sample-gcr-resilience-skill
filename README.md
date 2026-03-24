@@ -14,8 +14,8 @@ These skills map to the [AWS Resilience Lifecycle Framework](https://docs.aws.am
 │                                                                                     │
 │  Stage 1: Set Objectives    Stage 2: Design & Implement    Stage 3: Evaluate & Test │
 │  ┌───────────────────┐      ┌───────────────────────┐      ┌─────────────────────┐  │
-│  │  aws-rma-          │      │  aws-resilience-       │      │  chaos-engineering-  │  │
-│  │  assessment        │─────►│  assessment            │─────►│  on-aws              │  │
+│  │  aws-rma-          │      │  resilience-            │      │  chaos-engineering-  │  │
+│  │  assessment        │─────►│  modeling               │─────►│  on-aws              │  │
 │  │                    │      │                        │      │                      │  │
 │  │  "Where are we?"   │      │  "What could go wrong?"│      │  "Does it actually   │  │
 │  │                    │      │                        │      │   break?"             │  │
@@ -54,7 +54,7 @@ These skills map to the [AWS Resilience Lifecycle Framework](https://docs.aws.am
 
 **Invoke:** Mention "RMA assessment" or "resilience maturity" in conversation.
 
-### 2. AWS Resilience Assessment (`resilience-modeling`)
+### 2. Resilience Modeling (`resilience-modeling`)
 
 **What it does:** Comprehensive technical resilience analysis of AWS infrastructure — maps components, identifies failure modes, rates risks, and generates actionable mitigation strategies.
 
@@ -131,17 +131,27 @@ Copy the skill directories into your project's skills folder, or reference them 
 .
 ├── aws-rma-assessment/                # Resilience Maturity Assessment
 │   ├── SKILL.md                       # Skill definition
-│   ├── MCP_SETUP_GUIDE.md             # MCP server configuration
-│   ├── resilience-framework.md        # AWS best practices reference
-│   ├── html-report-template.html      # Interactive HTML report template
-│   └── generate-html-report.py        # HTML report generation script
+│   ├── README.md                      # Skill documentation
+│   └── references/                    # Reference documents
+│       ├── questions-data.json        # 80 assessment questions (JSON)
+│       ├── questions-priority.md      # Priority classification (P0-P3)
+│       ├── question-groups.md         # Batch Q&A grouping strategy
+│       └── report-template.md         # Report generation template
 │
-├── resilience-modeling/         # Technical Resilience Assessment
+├── resilience-modeling/               # Technical Resilience Assessment
 │   ├── SKILL.md                       # Skill definition
-│   ├── MCP_SETUP_GUIDE.md             # MCP server configuration
-│   ├── resilience-framework.md        # AWS best practices reference
-│   ├── html-report-template.html      # Interactive HTML report template
-│   └── generate-html-report.py        # HTML report generation script
+│   ├── README.md                      # Skill documentation
+│   ├── references/                    # Reference documents
+│   │   ├── resilience-framework.md    # AWS best practices reference
+│   │   ├── common-risks-reference.md  # 50+ common AWS risk patterns
+│   │   ├── report-generation.md       # Report generation guide
+│   │   ├── MCP_SETUP_GUIDE.md        # MCP server configuration
+│   │   └── ...
+│   ├── scripts/
+│   │   └── generate-html-report.py    # HTML report generation script
+│   └── assets/
+│       ├── html-report-template.html  # Interactive HTML report template
+│       └── example-report-template.md # Markdown report example
 │
 ├── chaos-engineering-on-aws/          # Chaos Engineering Experiments
 │   ├── SKILL.md                       # Skill definition (6-step workflow)

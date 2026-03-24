@@ -14,8 +14,8 @@
 │                                                                                     │
 │  Stage 1: 设定目标          Stage 2: 设计与实施          Stage 3: 评估与测试          │
 │  ┌───────────────────┐      ┌───────────────────────┐      ┌─────────────────────┐  │
-│  │  aws-rma-          │      │  aws-resilience-       │      │  chaos-engineering-  │  │
-│  │  assessment        │─────►│  assessment            │─────►│  on-aws              │  │
+│  │  aws-rma-          │      │  resilience-            │      │  chaos-engineering-  │  │
+│  │  assessment        │─────►│  modeling               │─────►│  on-aws              │  │
 │  │                    │      │                        │      │                      │  │
 │  │  "我们在哪里？"    │      │  "哪里可能出问题？"    │      │  "真的会坏吗？"      │  │
 │  └───────────────────┘      └───────────────────────┘      └──────────┬───────────┘  │
@@ -53,7 +53,7 @@
 
 **调用方式：** 在对话中提及 "RMA 评估" 或 "韧性成熟度"。
 
-### 2. AWS 韧性评估 (`resilience-modeling`)
+### 2. 韧性建模 (`resilience-modeling`)
 
 **功能：** 对 AWS 基础设施进行全面的技术韧性分析 — 映射组件、识别故障模式、评估风险、生成可操作的缓解策略。
 
@@ -130,17 +130,27 @@ git clone https://github.com/aws-samples/sample-gcr-resilience-skill.git
 .
 ├── aws-rma-assessment/                # 韧性成熟度评估
 │   ├── SKILL.md                       # Skill 定义
-│   ├── MCP_SETUP_GUIDE.md             # MCP 服务器配置
-│   ├── resilience-framework.md        # AWS 最佳实践参考
-│   ├── html-report-template.html      # 交互式 HTML 报告模板
-│   └── generate-html-report.py        # HTML 报告生成脚本
+│   ├── README.md                      # Skill 说明文档
+│   └── references/                    # 参考文档
+│       ├── questions-data.json        # 80 个评估问题（JSON）
+│       ├── questions-priority.md      # 优先级分类（P0-P3）
+│       ├── question-groups.md         # 批量问答分组策略
+│       └── report-template.md         # 报告生成模板
 │
-├── resilience-modeling/         # 技术韧性评估
+├── resilience-modeling/               # 技术韧性评估
 │   ├── SKILL.md                       # Skill 定义
-│   ├── MCP_SETUP_GUIDE.md             # MCP 服务器配置
-│   ├── resilience-framework.md        # AWS 最佳实践参考
-│   ├── html-report-template.html      # 交互式 HTML 报告模板
-│   └── generate-html-report.py        # HTML 报告生成脚本
+│   ├── README.md                      # Skill 说明文档
+│   ├── references/                    # 参考文档
+│   │   ├── resilience-framework.md    # AWS 最佳实践参考
+│   │   ├── common-risks-reference.md  # 50+ 个常见 AWS 风险模式
+│   │   ├── report-generation.md       # 报告生成指南
+│   │   ├── MCP_SETUP_GUIDE.md        # MCP 服务器配置
+│   │   └── ...
+│   ├── scripts/
+│   │   └── generate-html-report.py    # HTML 报告生成脚本
+│   └── assets/
+│       ├── html-report-template.html  # 交互式 HTML 报告模板
+│       └── example-report-template.md # Markdown 报告示例
 │
 ├── chaos-engineering-on-aws/          # 混沌工程实验
 │   ├── SKILL.md                       # Skill 定义（六步工作流）
