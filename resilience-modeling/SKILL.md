@@ -1,5 +1,5 @@
 ---
-name: aws-resilience-assessment
+name: resilience-modeling
 description: >-
   Conduct comprehensive AWS system resilience analysis and risk assessment.
   Use when the user wants to evaluate AWS infrastructure resilience, identify
@@ -43,12 +43,28 @@ model: sonnet
 
 ## MCP 服务器要求
 
-本 Skill 推荐使用 MCP 服务器实现自动化 AWS 资源扫描。已配置三个核心服务器：
-- **aws-manager**：EC2、Lambda、SSM 操作
-- **aws-core**：DynamoDB、Lambda、API Gateway 操作
-- **aws-sso**：AWS SSO 认证、多账户管理、安全执行 AWS CLI 命令
+> `awslabs.core-mcp-server` 已废弃。请直接配置独立 MCP Server。
 
-通过 `aws-sso` MCP 还支持 CloudWatch、EKS、RDS、ELB 等扩展服务的 CLI 命令。
+本 Skill 推荐使用 AWS 官方独立 MCP 服务器实现自动化资源扫描和分析。
+
+**必需（核心能力）**：
+
+| MCP Server | 用途 |
+|-----------|------|
+| **aws-api-mcp-server** | 通用 AWS API 访问（EC2、RDS、ELB、S3、Lambda 等资源的 Describe/List 操作） |
+| **cloudwatch-mcp-server** | 指标读取、告警查询、日志分析 |
+
+**按需（根据架构选配）**：
+
+| MCP Server | 适用场景 |
+|-----------|---------|
+| **eks-mcp-server** | 使用 EKS 时：集群管理、K8s 资源、Pod 日志 |
+| **ecs-mcp-server** | 使用 ECS 时：服务/任务管理 |
+| **dynamodb-mcp-server** | 使用 DynamoDB 时：表操作和查询 |
+| **lambda-tool-mcp-server** | 使用 Lambda 时：函数操作 |
+| **elasticache-mcp-server** | 使用 ElastiCache 时：集群管理 |
+| **iam-mcp-server** | IAM 策略和角色审计 |
+| **cloudtrail-mcp-server** | 审计日志查询 |
 
 如果 MCP 未配置，Skill 将自动切换到分析 IaC 代码、架构文档或交互式问答。
 详细配置指南参见 [MCP_SETUP_GUIDE.md](references/MCP_SETUP_GUIDE.md)。

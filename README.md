@@ -28,7 +28,7 @@ These skills map to the [AWS Resilience Lifecycle Framework](https://docs.aws.am
 | # | Skill | Lifecycle Stage | Input | Output |
 |---|-------|----------------|-------|--------|
 | 1 | **aws-rma-assessment** | Stage 1: Set Objectives | Guided Q&A with stakeholders | Resilience maturity score + improvement roadmap |
-| 2 | **aws-resilience-assessment** | Stage 2: Design & Implement | AWS account access or architecture docs | Risk inventory + resource scan + mitigation strategies |
+| 2 | **resilience-modeling** | Stage 2: Design & Implement | AWS account access or architecture docs | Risk inventory + resource scan + mitigation strategies |
 | 3 | **chaos-engineering-on-aws** | Stage 3: Evaluate & Test | Assessment report from Skill #2 | Experiment results + validation report + updated resilience score |
 
 ### Recommended Workflow
@@ -54,7 +54,7 @@ These skills map to the [AWS Resilience Lifecycle Framework](https://docs.aws.am
 
 **Invoke:** Mention "RMA assessment" or "resilience maturity" in conversation.
 
-### 2. AWS Resilience Assessment (`aws-resilience-assessment`)
+### 2. AWS Resilience Assessment (`resilience-modeling`)
 
 **What it does:** Comprehensive technical resilience analysis of AWS infrastructure — maps components, identifies failure modes, rates risks, and generates actionable mitigation strategies.
 
@@ -136,7 +136,7 @@ Copy the skill directories into your project's skills folder, or reference them 
 │   ├── html-report-template.html      # Interactive HTML report template
 │   └── generate-html-report.py        # HTML report generation script
 │
-├── aws-resilience-assessment/         # Technical Resilience Assessment
+├── resilience-modeling/         # Technical Resilience Assessment
 │   ├── SKILL.md                       # Skill definition
 │   ├── MCP_SETUP_GUIDE.md             # MCP server configuration
 │   ├── resilience-framework.md        # AWS best practices reference
