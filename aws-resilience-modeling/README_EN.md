@@ -30,7 +30,6 @@ Claude will first ask for your environment information and business context, the
 The skill activates automatically when you mention the following keywords in conversation:
 - "AWS resilience analysis"
 - "system risk assessment"
-- "AWS elasticity assessment"
 - "AWS resilience assessment"
 
 Example:
