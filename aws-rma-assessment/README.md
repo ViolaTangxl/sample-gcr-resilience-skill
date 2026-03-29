@@ -1,3 +1,7 @@
+[English](README_EN.md) | **中文**
+
+---
+
 # RMA Assessment Assistant
 
 智能RMA（Reliability, Maintainability, Availability）韧性评估助手
