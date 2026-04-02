@@ -1,0 +1,530 @@
+# Unified Fault Type Catalog
+# Three-tier structure: Chaos Mesh (Pod/container) → FIS (single action) → FIS Scenarios (composite)
+#
+# Usage: LLM reads this file in Step 3 to select the appropriate fault injection tool.
+#   - AZ/region-level compound faults → fis_scenarios (composite: true)
+#   - AWS infrastructure-level faults → fis (single action)
+#   - K8s Pod/container-level faults → chaosmesh
+#
+# Adding new fault types: append to the appropriate section below. No need to modify SKILL.md.
+
+# ── Chaos Mesh: Pod/Container Layer ─────────────────────────────────────────
+chaosmesh:
+  # -- Pod Lifecycle --
+  - type: pod_kill
+    backend: chaosmesh
+    category: compute
+    crd: PodChaos
+    description: "Kill target Pods randomly, verify K8s self-healing"
+    default_params:
+      action: pod-kill
+      mode: fixed-percent
+      value: "50"
+      duration: "2m"
+    prerequisites:
+      - "Chaos Mesh installed in cluster"
+      - "Target Deployment replicas >= 2"
+    recommended_for: [eks-microservices]
+
+  - type: pod_failure
+    backend: chaosmesh
+    category: compute
+    crd: PodChaos
+    description: "Make Pods unavailable (replaced with pause image)"
+    default_params:
+      action: pod-failure
+      mode: one
+      duration: "5m"
+    prerequisites:
+      - "Chaos Mesh installed in cluster"
+    recommended_for: [eks-microservices]
+
+  - type: container_kill
+    backend: chaosmesh
+    category: compute
+    crd: PodChaos
+    description: "Kill a specific container within a Pod"
+    default_params:
+      action: container-kill
+      mode: one
+      duration: "2m"
+    prerequisites:
+      - "Chaos Mesh installed in cluster"
+      - "Multi-container Pod (sidecar pattern)"
+    recommended_for: [eks-microservices]
+
+  # -- Network --
+  - type: network_delay
+    backend: chaosmesh
+    category: network
+    crd: NetworkChaos
+    description: "Inject network delay between services"
+    default_params:
+      action: delay
+      latency: "200ms"
+      jitter: "50ms"
+      mode: all
+      duration: "5m"
+    prerequisites:
+      - "Chaos Mesh installed in cluster"
+    recommended_for: [eks-microservices]
+
+  - type: network_loss
+    backend: chaosmesh
+    category: network
+    crd: NetworkChaos
+    description: "Inject packet loss between services"
+    default_params:
+      action: loss
+      loss: "30"
+      mode: all
+      duration: "5m"
+    prerequisites:
+      - "Chaos Mesh installed in cluster"
+    recommended_for: [eks-microservices]
+
+  - type: network_partition
+    backend: chaosmesh
+    category: network
+    crd: NetworkChaos
+    description: "Create network partition between services"
+    default_params:
+      action: partition
+      direction: both
+      mode: all
+      duration: "5m"
+    prerequisites:
+      - "Chaos Mesh installed in cluster"
+    recommended_for: [eks-microservices]
+
+  - type: network_bandwidth
+    backend: chaosmesh
+    category: network
+    crd: NetworkChaos
+    description: "Limit network bandwidth"
+    default_params:
+      action: bandwidth
+      rate: "1mbps"
+      mode: all
+      duration: "5m"
+    prerequisites:
+      - "Chaos Mesh installed in cluster"
+    recommended_for: [eks-microservices]
+
+  # -- HTTP Layer --
+  - type: http_abort
+    backend: chaosmesh
+    category: http
+    crd: HTTPChaos
+    description: "Abort HTTP connections to target service"
+    default_params:
+      abort: true
+      port: 80
+      mode: all
+      duration: "3m"
+    prerequisites:
+      - "Chaos Mesh installed in cluster"
+      - "Target service uses HTTP"
+    recommended_for: [eks-microservices]
+
+  - type: http_delay
+    backend: chaosmesh
+    category: http
+    crd: HTTPChaos
+    description: "Inject delay into HTTP responses"
+    default_params:
+      delay: "3s"
+      port: 80
+      mode: all
+      duration: "5m"
+    prerequisites:
+      - "Chaos Mesh installed in cluster"
+      - "Target service uses HTTP"
+    recommended_for: [eks-microservices]
+
+  # -- Resource Stress --
+  - type: cpu_stress
+    backend: chaosmesh
+    category: stress
+    crd: StressChaos
+    description: "CPU stress on target Pods"
+    default_params:
+      workers: 2
+      load: 80
+      duration: "5m"
+    prerequisites:
+      - "Chaos Mesh installed in cluster"
+      - "Pod resource limits configured"
+    recommended_for: [eks-microservices]
+
+  - type: memory_stress
+    backend: chaosmesh
+    category: stress
+    crd: StressChaos
+    description: "Memory stress on target Pods"
+    default_params:
+      workers: 1
+      size: "256MB"
+      duration: "5m"
+    prerequisites:
+      - "Chaos Mesh installed in cluster"
+      - "Pod resource limits configured"
+    recommended_for: [eks-microservices]
+
+  # -- IO --
+  - type: io_latency
+    backend: chaosmesh
+    category: io
+    crd: IOChaos
+    description: "Inject file IO latency"
+    default_params:
+      action: latency
+      delay: "100ms"
+      duration: "5m"
+    prerequisites:
+      - "Chaos Mesh installed in cluster"
+    recommended_for: [eks-microservices]
+
+  - type: io_fault
+    backend: chaosmesh
+    category: io
+    crd: IOChaos
+    description: "Inject file IO errors"
+    default_params:
+      action: fault
+      errno: 5
+      duration: "3m"
+    prerequisites:
+      - "Chaos Mesh installed in cluster"
+    recommended_for: [eks-microservices]
+
+  # -- DNS --
+  - type: dns_error
+    backend: chaosmesh
+    category: dns
+    crd: DNSChaos
+    description: "DNS resolution returns error"
+    default_params:
+      action: error
+      mode: all
+      duration: "3m"
+    prerequisites:
+      - "Chaos Mesh installed in cluster"
+      - "Chaos Mesh DNS server enabled"
+    recommended_for: [eks-microservices]
+
+# ── FIS: AWS Infrastructure Single Actions ──────────────────────────────────
+fis:
+  # -- EC2 --
+  - type: ec2_terminate
+    backend: fis
+    category: compute
+    fis_action_id: "aws:ec2:terminate-instances"
+    description: "Terminate EC2 instances (SPOF validation)"
+    default_params:
+      duration: "5m"
+    prerequisites:
+      - "FIS IAM Role with ec2:TerminateInstances"
+      - "ASG or replacement mechanism in place"
+    recommended_for: [ec2-traditional, eks-microservices]
+
+  - type: ec2_stop
+    backend: fis
+    category: compute
+    fis_action_id: "aws:ec2:stop-instances"
+    description: "Stop EC2 instances (recoverable)"
+    default_params:
+      duration: "5m"
+      startInstancesAfterDuration: "PT5M"
+    prerequisites:
+      - "FIS IAM Role with ec2:StopInstances, ec2:StartInstances"
+    recommended_for: [ec2-traditional]
+
+  - type: ec2_reboot
+    backend: fis
+    category: compute
+    fis_action_id: "aws:ec2:reboot-instances"
+    description: "Reboot EC2 instances"
+    default_params: {}
+    prerequisites:
+      - "FIS IAM Role with ec2:RebootInstances"
+    recommended_for: [ec2-traditional]
+
+  - type: ec2_spot_interruption
+    backend: fis
+    category: compute
+    fis_action_id: "aws:ec2:send-spot-instance-interruptions"
+    description: "Simulate Spot instance interruptions"
+    default_params:
+      durationBeforeInterruption: "PT2M"
+    prerequisites:
+      - "FIS IAM Role with ec2:SendSpotInstanceInterruptions"
+      - "Target instances are Spot instances"
+    recommended_for: [ec2-traditional, eks-microservices]
+
+  - type: ec2_network_disrupt
+    backend: fis
+    category: network
+    fis_action_id: "aws:ec2:disrupt-network-connectivity"
+    description: "EC2 network disruption via NACL modification"
+    default_params:
+      duration: "PT5M"
+      scope: "all"
+    prerequisites:
+      - "FIS IAM Role with ec2:CreateNetworkAcl*, ec2:DeleteNetworkAcl*"
+    recommended_for: [ec2-traditional]
+
+  # -- EKS --
+  - type: eks_terminate_nodes
+    backend: fis
+    category: compute
+    fis_action_id: "aws:eks:terminate-nodegroup-instances"
+    description: "Terminate EKS node group instances (recommended for node-level)"
+    default_params:
+      instanceTerminationPercentage: "30"
+    prerequisites:
+      - "FIS IAM Role with eks:* and ec2:TerminateInstances"
+      - "Managed node group or ASG-backed nodes"
+    recommended_for: [eks-microservices]
+
+  # -- RDS --
+  - type: rds_failover
+    backend: fis
+    category: data
+    fis_action_id: "aws:rds:failover-db-cluster"
+    description: "Aurora/RDS cluster failover"
+    default_params: {}
+    prerequisites:
+      - "FIS IAM Role with rds:FailoverDBCluster"
+      - "Multi-AZ cluster with reader instance"
+    recommended_for: [all]
+
+  - type: rds_reboot
+    backend: fis
+    category: data
+    fis_action_id: "aws:rds:reboot-db-instances"
+    description: "Reboot RDS instances"
+    default_params: {}
+    prerequisites:
+      - "FIS IAM Role with rds:RebootDBInstance"
+    recommended_for: [all]
+
+  # -- Lambda --
+  - type: lambda_delay
+    backend: fis
+    category: serverless
+    fis_action_id: "aws:lambda:invocation-add-delay"
+    description: "Inject delay into Lambda invocations"
+    default_params:
+      duration: "PT5M"
+      delayMilliseconds: "2000"
+      invocationPercentage: "100"
+    prerequisites:
+      - "FIS IAM Role with lambda:* permissions (FIS extension)"
+      - "Lambda function ARN"
+    recommended_for: [serverless]
+
+  - type: lambda_error
+    backend: fis
+    category: serverless
+    fis_action_id: "aws:lambda:invocation-error"
+    description: "Inject errors into Lambda invocations"
+    default_params:
+      duration: "PT5M"
+      invocationPercentage: "50"
+    prerequisites:
+      - "FIS IAM Role with lambda:* permissions (FIS extension)"
+      - "Lambda function ARN"
+    recommended_for: [serverless]
+
+  # -- Network --
+  - type: network_disrupt
+    backend: fis
+    category: network
+    fis_action_id: "aws:network:disrupt-connectivity"
+    description: "Subnet/SG-level network disruption (AZ isolation)"
+    default_params:
+      duration: "PT5M"
+      scope: "all"
+    prerequisites:
+      - "FIS IAM Role with ec2:CreateNetworkAcl*, ec2:DeleteNetworkAcl*"
+      - "Multi-AZ deployment"
+    recommended_for: [multi-az, ec2-traditional, eks-microservices]
+
+  - type: network_cross_region_route
+    backend: fis
+    category: network
+    fis_action_id: "aws:network:route-table-disrupt-cross-region-connectivity"
+    description: "Cross-region route table disruption"
+    default_params:
+      duration: "PT5M"
+    prerequisites:
+      - "FIS IAM Role with ec2:CreateRoute, ec2:DeleteRoute, ec2:ReplaceRoute"
+      - "Multi-region architecture with VPC Peering or TGW"
+    recommended_for: [multi-region]
+
+  # -- Storage --
+  - type: ebs_pause_io
+    backend: fis
+    category: storage
+    fis_action_id: "aws:ebs:pause-volume-io"
+    description: "Pause EBS volume IO"
+    default_params:
+      duration: "PT5M"
+    prerequisites:
+      - "FIS IAM Role with ec2:PauseVolumeIO"
+      - "EBS volume attached to target instance"
+    recommended_for: [ec2-traditional, eks-microservices]
+
+  # -- DynamoDB --
+  - type: dynamodb_pause_replication
+    backend: fis
+    category: data
+    fis_action_id: "aws:dynamodb:global-table-pause-replication"
+    description: "Pause DynamoDB global table replication"
+    default_params:
+      duration: "PT5M"
+    prerequisites:
+      - "FIS IAM Role with dynamodb:* permissions"
+      - "DynamoDB Global Table configured"
+    recommended_for: [multi-region, serverless]
+
+  # -- ElastiCache --
+  - type: elasticache_az_power
+    backend: fis
+    category: cache
+    fis_action_id: "aws:elasticache:interrupt-cluster-az-power"
+    description: "ElastiCache AZ power interruption"
+    default_params:
+      duration: "PT5M"
+    prerequisites:
+      - "FIS IAM Role with elasticache:InterruptClusterAzPower"
+      - "Multi-AZ ElastiCache cluster"
+    recommended_for: [multi-az]
+
+  # -- S3 --
+  - type: s3_pause_replication
+    backend: fis
+    category: storage
+    fis_action_id: "aws:s3:bucket-pause-replication"
+    description: "Pause S3 cross-region replication"
+    default_params:
+      duration: "PT10M"
+    prerequisites:
+      - "FIS IAM Role with s3:PutReplicationConfiguration"
+      - "S3 CRR configured"
+    recommended_for: [multi-region]
+
+  # -- FIS API Errors --
+  - type: api_internal_error
+    backend: fis
+    category: api
+    fis_action_id: "aws:fis:inject-api-internal-error"
+    description: "Inject 500 errors into AWS API requests"
+    default_params:
+      duration: "PT5M"
+      percentage: "100"
+      service: "ec2"
+      operations: "DescribeInstances"
+    prerequisites:
+      - "FIS IAM Role (basic)"
+      - "Target IAM Role ARN"
+    recommended_for: [all]
+
+  - type: api_throttle
+    backend: fis
+    category: api
+    fis_action_id: "aws:fis:inject-api-throttle-error"
+    description: "Inject throttling errors into AWS API requests"
+    default_params:
+      duration: "PT5M"
+      percentage: "100"
+      service: "ec2"
+      operations: "DescribeInstances"
+    prerequisites:
+      - "FIS IAM Role (basic)"
+      - "Target IAM Role ARN"
+    recommended_for: [all]
+
+# ── FIS Scenario Library: Composite Scenarios ───────────────────────────────
+# ⚠️ These templates CANNOT be created via FIS API.
+# They must be created through AWS Console → FIS → Scenario Library.
+# See references/scenario-library.md for full JSON skeletons and prerequisites.
+fis_scenarios:
+  - type: az_power_interruption
+    backend: fis-scenario
+    category: az-level
+    composite: true
+    scenario_id: "az-availability-scenario"
+    description: "AZ Power Interruption — simultaneously affects EC2/RDS/EBS/ElastiCache in one AZ"
+    sub_actions:
+      - aws:ec2:stop-instances
+      - aws:rds:failover-db-cluster
+      - aws:ebs:pause-volume-io
+      - aws:elasticache:interrupt-cluster-az-power
+    required_tags:
+      AzImpairmentPower: "IceQualified"
+    template_source: "docs"  # ⚠️ Must create via Console Scenario Library, not API
+    doc_url: "https://docs.aws.amazon.com/fis/latest/userguide/az-availability-scenario.html"
+    prerequisites:
+      - "Target resources must be tagged with required tags"
+      - "FIS Role must cover all sub_action permissions"
+      - "Multi-AZ deployment architecture"
+      - "Sufficient capacity in remaining AZs"
+    recommended_for: [multi-az]
+
+  - type: az_app_slowdown
+    backend: fis-scenario
+    category: az-level
+    composite: true
+    scenario_id: "az-application-slowdown-scenario"
+    description: "AZ Application Slowdown — application-layer degradation (latency/packet loss) in one AZ"
+    sub_actions:
+      - aws:ec2:disrupt-network-connectivity
+      - aws:lambda:invocation-add-delay
+    required_tags:
+      AzImpairmentPower: "IceQualified"
+    template_source: "docs"
+    doc_url: "https://docs.aws.amazon.com/fis/latest/userguide/az-application-slowdown-scenario.html"
+    prerequisites:
+      - "Target subnets tagged appropriately"
+      - "FIS Role with NACL and Lambda permissions"
+      - "Application-level (not just TCP) health checks"
+    recommended_for: [multi-az, serverless]
+
+  - type: cross_az_traffic_slowdown
+    backend: fis-scenario
+    category: cross-az
+    composite: true
+    scenario_id: "cross-az-traffic-slowdown-scenario"
+    description: "Cross-AZ Traffic Slowdown — degraded inter-AZ network, intra-AZ normal"
+    sub_actions:
+      - aws:network:disrupt-connectivity
+    required_tags:
+      AzImpairmentPower: "IceQualified"
+    template_source: "docs"
+    doc_url: "https://docs.aws.amazon.com/fis/latest/userguide/cross-az-traffic-slowdown-scenario.html"
+    prerequisites:
+      - "Subnets in target AZ tagged"
+      - "FIS Role with NACL permissions"
+      - "Cross-AZ latency monitoring in place"
+    recommended_for: [multi-az]
+
+  - type: cross_region_connectivity
+    backend: fis-scenario
+    category: cross-region
+    composite: true
+    scenario_id: "cross-region-scenario"
+    description: "Cross-Region Connectivity — disrupt connectivity between AWS regions"
+    sub_actions:
+      - aws:network:route-table-disrupt-cross-region-connectivity
+      - aws:network:transit-gateway-disrupt-cross-region-connectivity
+    required_tags: {}
+    template_source: "docs"
+    doc_url: "https://docs.aws.amazon.com/fis/latest/userguide/cross-region-scenario.html"
+    prerequisites:
+      - "Multi-region architecture (VPC Peering, TGW, or Direct Connect)"
+      - "FIS Role with route table and TGW permissions"
+      - "Cross-region health checks and failover configured"
+      - "DNS failover (Route 53) or Global Accelerator in place"
+    recommended_for: [multi-region]

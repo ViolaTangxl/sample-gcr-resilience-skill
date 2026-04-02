@@ -165,20 +165,32 @@ Starting from the suggested experiments in section 2.5, generate full configurat
 
 #### 3.4 Tool Selection
 
+Consult the **unified fault catalog** ([references/fault-catalog.yaml](references/fault-catalog.yaml)) for the full list of available fault types, default parameters, and prerequisites. The selection logic:
+
 ```
-AWS managed services / infrastructure layer → AWS FIS
+AZ/Region-level compound faults → FIS Scenario Library (pre-built composite scenarios)
+  ├── AZ Power Interruption (EC2 + RDS + EBS + ElastiCache coordinated)
+  ├── AZ Application Slowdown (network degradation + Lambda delay)
+  ├── Cross-AZ Traffic Slowdown (inter-AZ network degradation)
+  └── Cross-Region Connectivity (route table + TGW disruption)
+  → fault-catalog.yaml: fis_scenarios section (composite: true)
+  → Template: scenario-library.md (must create via Console, not API)
+
+AWS managed services / infrastructure layer → AWS FIS (single action)
   ├── Node-level: eks:terminate-nodegroup-instances
   ├── Instance-level: ec2:terminate/stop/reboot
   ├── Database-level: rds:failover, rds:reboot
   ├── Network-level: network:disrupt-connectivity
   ├── Storage-level: ebs:pause-volume-io
   └── Serverless: lambda:invocation-add-delay/error
+  → fault-catalog.yaml: fis section
 
 K8s Pod/container layer → Chaos Mesh (recommended)
   ├── Pod lifecycle: PodChaos (kill/failure)
   ├── Microservice network: NetworkChaos (delay/loss/partition)
   ├── HTTP layer: HTTPChaos (abort/delay)
   └── Resource stress: StressChaos (cpu/memory)
+  → fault-catalog.yaml: chaosmesh section
 
 Beyond coverage → AWS CLI / SSM / custom Lambda
 ```
@@ -188,8 +200,13 @@ Beyond coverage → AWS CLI / SSM / custom Lambda
 > Chaos Mesh is more lightweight for Pod-level operations, faster (takes effect in seconds), and simpler to configure.
 > FIS should focus on its strength: **infrastructure layer** — node termination, AZ isolation, database failover, network disruption, etc.
 
+> ⚠️ **Important**: FIS Scenario Library templates **cannot** be created via the FIS API. They must be created through the **AWS Console → FIS → Scenario Library**. Target resources must be pre-tagged with scenario-specific tags (e.g., `AzImpairmentPower: IceQualified`). See [references/scenario-library.md](references/scenario-library.md) for JSON skeletons and full requirements.
+
+Unified fault catalog: [references/fault-catalog.yaml](references/fault-catalog.yaml)
+FIS Scenario Library reference: [references/scenario-library.md](references/scenario-library.md)
 Detailed FIS Actions reference: [references/fis-actions.md](references/fis-actions.md)
 Detailed Chaos Mesh CRD reference: [references/chaosmesh-crds.md](references/chaosmesh-crds.md)
+Prerequisites checklist: [references/prerequisites-checklist.md](references/prerequisites-checklist.md)
 
 #### 3.5 Configuration Generation Strategy
 

@@ -165,20 +165,32 @@ output/
 
 #### 3.4 工具选择
 
+查阅**统一故障类型注册表**（[references/fault-catalog.yaml](references/fault-catalog.yaml)）获取所有可用故障类型、默认参数和前置条件。选择逻辑：
+
 ```
-AWS 托管服务 / 基础设施层 → AWS FIS
+AZ/Region 级复合故障 → FIS Scenario Library（预构建复合场景）
+  ├── AZ Power Interruption（EC2 + RDS + EBS + ElastiCache 联动）
+  ├── AZ Application Slowdown（网络退化 + Lambda 延迟）
+  ├── Cross-AZ Traffic Slowdown（跨 AZ 网络退化）
+  └── Cross-Region Connectivity（路由表 + TGW 中断）
+  → fault-catalog.yaml: fis_scenarios 段（composite: true）
+  → 模板：scenario-library_zh.md（必须通过控制台创建，不能用 API）
+
+AWS 托管服务 / 基础设施层 → AWS FIS（单 action）
   ├── 节点级: eks:terminate-nodegroup-instances
   ├── 实例级: ec2:terminate/stop/reboot
   ├── 数据库级: rds:failover, rds:reboot
   ├── 网络级: network:disrupt-connectivity
   ├── 存储级: ebs:pause-volume-io
   └── 无服务器: lambda:invocation-add-delay/error
+  → fault-catalog.yaml: fis 段
 
 K8s Pod/容器层 → Chaos Mesh（推荐）
   ├── Pod 生命周期: PodChaos (kill/failure)
   ├── 微服务网络: NetworkChaos (delay/loss/partition)
   ├── HTTP 层: HTTPChaos (abort/delay)
   └── 资源压力: StressChaos (cpu/memory)
+  → fault-catalog.yaml: chaosmesh 段
 
 超出覆盖 → AWS CLI / SSM / 自定义 Lambda
 ```
@@ -188,8 +200,13 @@ K8s Pod/容器层 → Chaos Mesh（推荐）
 > Chaos Mesh 在 Pod 级操作更轻量、更快（秒级生效）、配置更简单。
 > FIS 应专注其强项：**基础设施层** — 节点终止、AZ 隔离、数据库故障转移、网络中断等。
 
+> ⚠️ **重要**：FIS Scenario Library 模板**不能**通过 FIS API 创建。必须通过 **AWS 控制台 → FIS → Scenario Library** 创建。目标资源必须预先打上场景特定标签（如 `AzImpairmentPower: IceQualified`）。详见 [references/scenario-library_zh.md](references/scenario-library_zh.md) 获取 JSON 骨架和完整要求。
+
+统一故障类型注册表：[references/fault-catalog.yaml](references/fault-catalog.yaml)
+FIS Scenario Library 参考：[references/scenario-library_zh.md](references/scenario-library_zh.md)
 详细 FIS Actions 参考：[references/fis-actions_zh.md](references/fis-actions_zh.md)
 详细 Chaos Mesh CRD 参考：[references/chaosmesh-crds_zh.md](references/chaosmesh-crds_zh.md)
+前置条件清单：[references/prerequisites-checklist_zh.md](references/prerequisites-checklist_zh.md)
 
 #### 3.5 配置生成策略
 
